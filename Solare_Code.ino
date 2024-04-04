@@ -1,22 +1,29 @@
 //#include <MKRGSM.h>
-#include <SIM800L.h>
+#include <SoftwareSerial.h>
 #include <DHT11.h>
 
 
 //Assign pin numbers to variables for convenience of calling it in functions
-const byte ult_Sen_Pin = 10;
 const byte echo_Pin = 13;
 const byte trig_Pin = 12;
+DHT11 dht11(11);
+const byte ult_Sen_Pin = 10;
+const byte siren_Severity_1 = 9;
+const byte siren_Severity_2 = 8;
+const byte siren_Severity_3 = 7;
 const byte red = A2;
 const byte blue = A0;
 const byte green = A1;
-const int flood_Level_1 = 10;
-const int flood_Level_2 = 5;
-const int flood_Level_3 = 2;
+SoftwareSerial gsmMod(3, 2);
+
+//Assign variables constants for use ibn logic and whatnot
+const int flood_Level_1 = 10; //Distance between water and ultsen to determine flood level
+const int flood_Level_2 = 5; //Distance between water and ultsen to determine flood level
+const int flood_Level_3 = 2; //Distance between water and ultsen to determine flood level
 const float sound_Speed = 0.0343; //Initialize for use in get_Distance() function
-const float normal_Humidity = 50; //This variable is what we will compare the RH to, to dtermine if it is raining
-const float normal_Temperature = 27; //Change this variable to the value of the temperature when it is raining
-const char test_Number[] = "+639948033248"; //Phone number ni Ash
+const float normal_Humidity = 50; //This variable is what we will compare the relative humidity to, to determine if it is raining
+const float normal_Temperature = 27; //This variable is what we will compare the relative temp to, to determine if it is raining
+String test_Number = "+639948033248"; //Phone number ni Ash; For debugging purposes
 bool rain = false; //This variable is the placeholder for the condition when the device will assume its raining and start running the flood level detection processes
 //Basically, "if raining then check if flooding"
 int flood_Severity = 0;
@@ -28,7 +35,6 @@ char flood_Message_Light[] = "The flood is 4in deep. Please stay alert for evacu
 char flood_Message_Moderate[] = "The flood is 8in deep. Please stay alert for evacuation";
 char flood_Message_Severe[] = "The flood is 8in deep. Please evacuate";
 
-DHT11 dht11(11);
 
 void setup () {
 
@@ -39,7 +45,12 @@ void setup () {
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
   Serial.begin(9600);
+  gsmMod.begin(9600);
   rgb(255, 0, 0);
+
+  gsmMod.println("AT+CMGF=1"); // Configuring TEXT mode
+  gsmMod.println("AT+CMGS=\"+639948033248\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms
+  updateSerial();
 }
 
 void loop () {
@@ -68,34 +79,38 @@ void loop () {
 
   switch (flood_Severity) {
     case 0:
-    Serial.println("No flood hooray");
-    digitalWrite(4, LOW);
-    rgb(255, 255, 255);
+      Serial.println("No flood hooray");
+      digitalWrite(siren_Severity_1, LOW);
+      digitalWrite(siren_Severity_2, LOW);
+      digitalWrite(siren_Severity_3, LOW);
+      rgb(255, 255, 255);
     break;
 
     case 1:
-    send_SMS(test_Number, flood_Message_Light);
-    digitalWrite(4, HIGH); //Testing purposes
-    Serial.println("Level 1 Flood");
-    rgb(255, 0, 255);
+      send_SMS(test_Number, flood_Message_Light);
+      digitalWrite(siren_Severity_1, HIGH); 
+      Serial.println("Level 1 Flood");
+      rgb(255, 0, 255);
     break;
 
     case 2:
-    send_SMS(test_Number, flood_Message_Moderate);
-    digitalWrite(4, HIGH); //Testing purposes
-    Serial.println("Level 2 Flood");
-    rgb(255, 165, 0);
+      send_SMS(test_Number, flood_Message_Moderate);
+      digitalWrite(siren_Severity_2, HIGH); 
+      Serial.println("Level 2 Flood");
+      rgb(255, 165, 0);
     break;
 
     case 3:
-    send_SMS(test_Number, flood_Message_Severe);
-    digitalWrite(4, HIGH); //Testing purposes
-    Serial.println("Level 3 Flood");
-    rgb(255, 0, 0);
+      send_SMS(test_Number, flood_Message_Severe);
+      digitalWrite(siren_Severity_3, HIGH); 
+      Serial.println("Level 3 Flood");
+      rgb(255, 0, 0);
     break;
 
     default:
-    digitalWrite(4, LOW); //Testing purposes
+      digitalWrite(siren_Severity_1, LOW);
+      digitalWrite(siren_Severity_2, LOW);
+      digitalWrite(siren_Severity_3, LOW);
     break;
   }
 
@@ -131,9 +146,14 @@ void get_Humidity() {
   //rain = true;
 }
 
-void send_SMS(char recipient_Num[], char message[]) {
-  //Placeholder
-  //Haven't figured out how to send messages using the SIM800L yet
+void send_SMS(String recipient_Num, String message) {
+  gsmMod.println("AT+CMGF=1"); // Configuring TEXT mode
+  updateSerial();
+  gsmMod.println("AT+CMGS=\"+639948033248\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms
+  updateSerial();
+  gsmMod.print(message); //text content
+  updateSerial();
+  gsmMod.write(26);
 }
 
 void rgb(int red_Val, int blue_Val, int green_Val) {
@@ -142,7 +162,18 @@ void rgb(int red_Val, int blue_Val, int green_Val) {
   analogWrite(green, green_Val);
 }
 
-
+void updateSerial()
+{
+  delay(500);
+  while (Serial.available()) 
+  {
+    gsmMod.write(Serial.read());//Forward what Serial received to Software Serial Port
+  }
+  while(gsmMod.available()) 
+  {
+    Serial.write(gsmMod.read());//Forward what Software Serial received to Serial Port
+  }
+}
 
 /*
   _   _       _         _                         
