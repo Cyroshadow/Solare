@@ -17,9 +17,9 @@ const byte green = A1;
 SoftwareSerial gsmMod(3, 2);
 
 //Assign variables constants for use ibn logic and whatnot
-const int flood_Level_1 = 10; //Distance between water and ultsen to determine flood level
-const int flood_Level_2 = 5; //Distance between water and ultsen to determine flood level
-const int flood_Level_3 = 2; //Distance between water and ultsen to determine flood level
+const int flood_Level_1 = 30; //Distance between water and ultsen to determine flood level
+const int flood_Level_2 = 20; //Distance between water and ultsen to determine flood level
+const int flood_Level_3 = 10; //Distance between water and ultsen to determine flood level
 const float sound_Speed = 0.0343; //Initialize for use in get_Distance() function
 const float normal_Humidity = 50; //This variable is what we will compare the relative humidity to, to determine if it is raining
 const float normal_Temperature = 27; //This variable is what we will compare the relative temp to, to determine if it is raining
@@ -45,6 +45,7 @@ void setup () {
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
   Serial.begin(9600);
+  Serial.print("Hello");
   gsmMod.begin(9600);
   rgb(255, 0, 0);
 
@@ -78,6 +79,8 @@ void loop () {
 
 
   switch (flood_Severity) {
+
+    //Uncomment send_SMS functions when doing final testing
     case 0:
       Serial.println("No flood hooray");
       digitalWrite(siren_Severity_1, LOW);
@@ -87,21 +90,21 @@ void loop () {
     break;
 
     case 1:
-      send_SMS(test_Number, flood_Message_Light);
+      //send_SMS(test_Number, flood_Message_Light);
       digitalWrite(siren_Severity_1, HIGH); 
       Serial.println("Level 1 Flood");
-      rgb(255, 0, 255);
+      rgb(0, 255, 0);
     break;
 
     case 2:
-      send_SMS(test_Number, flood_Message_Moderate);
+      //send_SMS(test_Number, flood_Message_Moderate);
       digitalWrite(siren_Severity_2, HIGH); 
       Serial.println("Level 2 Flood");
-      rgb(255, 165, 0);
+      rgb(255, 180, 0);
     break;
 
     case 3:
-      send_SMS(test_Number, flood_Message_Severe);
+      //send_SMS(test_Number, flood_Message_Severe);
       digitalWrite(siren_Severity_3, HIGH); 
       Serial.println("Level 3 Flood");
       rgb(255, 0, 0);
@@ -126,7 +129,7 @@ void get_Distance(int pulse_Length) {
 
   pulse_Delay = (pulseIn(echo_Pin, HIGH))/2; //Get the time it took for the pulse to get from the ultrasonic sensor to object
   distance = (pulse_Delay)*sound_Speed; //Compute for distance using formula speed*time
-
+  Serial.println(distance);
 }
 
 void get_Humidity() {
@@ -141,9 +144,9 @@ void get_Humidity() {
   }
   Serial.print("Humidity: ");
   Serial.println(humidity);
-  Serial.print("Temperature: ");
+  Serial.print("Temperature: "); 
   Serial.println(temperature);
-  //rain = true;
+  rain = true;
 }
 
 void send_SMS(String recipient_Num, String message) {
@@ -156,7 +159,7 @@ void send_SMS(String recipient_Num, String message) {
   gsmMod.write(26);
 }
 
-void rgb(int red_Val, int blue_Val, int green_Val) {
+void rgb(int red_Val, int green_Val, int blue_Val ) {
   analogWrite(red, red_Val);
   analogWrite(blue, blue_Val);
   analogWrite(green, green_Val);
@@ -164,7 +167,7 @@ void rgb(int red_Val, int blue_Val, int green_Val) {
 
 void updateSerial()
 {
-  delay(500);
+  //delay(500);
   while (Serial.available()) 
   {
     gsmMod.write(Serial.read());//Forward what Serial received to Software Serial Port
@@ -178,13 +181,13 @@ void updateSerial()
 /*
   _   _       _         _                         
  | \ | |     | |       | |                        
- |  \| | ___ | |_ ___  | |_ ___                   
+ |  \| | _ | |_ _  | |_ _                   
  | . ` |/ _ \| __/ _ \ | __/ _ \                  
- | |\  | (_) | ||  __/ | || (_) |                 
+ | |\  | () | ||  __/ | || () |                 
  |_| \_|\___/ \__\___|  \__\___/                  
    __       _                        _            
   / _|     | |                      | |           
- | |_ _   _| |_ _   _ _ __ ___    __| | _____   __
+ | |_ _   | | _   _ _ _ __    _| | ____   __
  |  _| | | | __| | | | '__/ _ \  / _` |/ _ \ \ / /
  | | | |_| | |_| |_| | | |  __/ | (_| |  __/\ V / 
  |_|  \__,_|\__|\__,_|_|  \___|  \__,_|\___| \_/  
