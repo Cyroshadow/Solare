@@ -91,21 +91,27 @@ void loop () {
 
     case 1:
       //send_SMS(test_Number, flood_Message_Light);
-      digitalWrite(siren_Severity_1, HIGH); 
+      digitalWrite(siren_Severity_1, HIGH);
+      digitalWrite(siren_Severity_2, LOW);
+      digitalWrite(siren_Severity_3, LOW);
       Serial.println("Level 1 Flood");
       rgb(0, 255, 0);
     break;
 
     case 2:
       //send_SMS(test_Number, flood_Message_Moderate);
-      digitalWrite(siren_Severity_2, HIGH); 
+      digitalWrite(siren_Severity_2, HIGH);
+      digitalWrite(siren_Severity_1, LOW);
+      digitalWrite(siren_Severity_3, LOW);
       Serial.println("Level 2 Flood");
       rgb(255, 180, 0);
     break;
 
     case 3:
       //send_SMS(test_Number, flood_Message_Severe);
-      digitalWrite(siren_Severity_3, HIGH); 
+      digitalWrite(siren_Severity_3, HIGH);
+      digitalWrite(siren_Severity_1, LOW);
+      digitalWrite(siren_Severity_2, LOW);
       Serial.println("Level 3 Flood");
       rgb(255, 0, 0);
     break;
