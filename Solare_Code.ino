@@ -83,41 +83,41 @@ void loop () {
     //Uncomment send_SMS functions when doing final testing
     case 0:
       Serial.println("No flood hooray");
-      digitalWrite(siren_Severity_1, LOW);
+      digitalWrite(siren_Severity_1, LOW); //Turn off all sirens
       digitalWrite(siren_Severity_2, LOW);
       digitalWrite(siren_Severity_3, LOW);
-      rgb(255, 255, 255);
+      rgb(255, 255, 255); //Turn LEDs to white
     break;
 
     case 1:
       //send_SMS(test_Number, flood_Message_Light);
-      digitalWrite(siren_Severity_1, HIGH);
+      digitalWrite(siren_Severity_1, HIGH); //Turn on siren noise 1
       digitalWrite(siren_Severity_2, LOW);
       digitalWrite(siren_Severity_3, LOW);
       Serial.println("Level 1 Flood");
-      rgb(0, 255, 0);
+      rgb(0, 255, 0); //Turn RGB LEDs to green
     break;
 
     case 2:
       //send_SMS(test_Number, flood_Message_Moderate);
-      digitalWrite(siren_Severity_2, HIGH);
+      digitalWrite(siren_Severity_2, HIGH); //Turn on siren noise 2
       digitalWrite(siren_Severity_1, LOW);
       digitalWrite(siren_Severity_3, LOW);
       Serial.println("Level 2 Flood");
-      rgb(255, 180, 0);
+      rgb(255, 165, 0); //Turn RGB LEDs to orange
     break;
 
     case 3:
       //send_SMS(test_Number, flood_Message_Severe);
-      digitalWrite(siren_Severity_3, HIGH);
+      digitalWrite(siren_Severity_3, HIGH); //Turn on siren noise 3
       digitalWrite(siren_Severity_1, LOW);
       digitalWrite(siren_Severity_2, LOW);
       Serial.println("Level 3 Flood");
-      rgb(255, 0, 0);
+      rgb(255, 0, 0); //Turn RGB LEDs to red
     break;
 
     default:
-      digitalWrite(siren_Severity_1, LOW);
+      digitalWrite(siren_Severity_1, LOW); //Turn off all siren noises (precaution)
       digitalWrite(siren_Severity_2, LOW);
       digitalWrite(siren_Severity_3, LOW);
     break;
@@ -128,7 +128,7 @@ void loop () {
 void get_Distance(int pulse_Length) {
 
   digitalWrite(trig_Pin, LOW); //Initialize trigger pin
-  delay(50);
+  delay(50); //Delay for accuracy
   digitalWrite(trig_Pin, HIGH); //Begin sending pulse
   delay(pulse_Length); //Increase length of pulse for accurate readings
   digitalWrite(trig_Pin, LOW); //Stop sending pulse
@@ -140,8 +140,8 @@ void get_Distance(int pulse_Length) {
 
 void get_Humidity() {
   
-  humidity = dht11.readHumidity();
-  temperature = dht11.readTemperature();
+  humidity = dht11.readHumidity(); //Get humidity
+  temperature = dht11.readTemperature(); //Get temperature
 
   if (humidity >= normal_Humidity && temperature <= normal_Temperature) {  //When debugging change to or instead of and
     rain = true;
@@ -152,13 +152,13 @@ void get_Humidity() {
   Serial.println(humidity);
   Serial.print("Temperature: "); 
   Serial.println(temperature);
-  rain = true;
+  rain = true; //Comment/remove this code when doing field/final testing
 }
 
 void send_SMS(String recipient_Num, String message) {
   gsmMod.println("AT+CMGF=1"); // Configuring TEXT mode
   updateSerial();
-  gsmMod.println("AT+CMGS=\"+639948033248\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms
+  gsmMod.println("AT+CMGS=\"+639948033248\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms; defaults to ash' phone number (sorry in advance for spam)
   updateSerial();
   gsmMod.print(message); //text content
   updateSerial();
@@ -173,7 +173,7 @@ void rgb(int red_Val, int green_Val, int blue_Val ) {
 
 void updateSerial()
 {
-  //delay(500);
+  delay(500); //COmment line of code when debugging
   while (Serial.available()) 
   {
     gsmMod.write(Serial.read());//Forward what Serial received to Software Serial Port
