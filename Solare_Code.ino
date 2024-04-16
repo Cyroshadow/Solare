@@ -21,9 +21,9 @@ const int flood_Level_1 = 30; //Distance between water and ultsen to determine f
 const int flood_Level_2 = 20; //Distance between water and ultsen to determine flood level
 const int flood_Level_3 = 10; //Distance between water and ultsen to determine flood level
 const float sound_Speed = 0.0343; //Initialize for use in get_Distance() function
-const float normal_Humidity = 50; //This variable is what we will compare the relative humidity to, to determine if it is raining
+const float normal_Humidity = 90; //This variable is what we will compare the relative humidity to, to determine if it is raining
 const float normal_Temperature = 27; //This variable is what we will compare the relative temp to, to determine if it is raining
-String test_Number = "+639948033248"; //Phone number ni Ash; For debugging purposes
+String test_Number = "+639948033248"; //Phone number ni Ash; For debugging purposes; I take it back this was left unused
 bool rain = false; //This variable is the placeholder for the condition when the device will assume its raining and start running the flood level detection processes
 //Basically, "if raining then check if flooding"
 int flood_Severity = 0;
