@@ -16,24 +16,30 @@ const byte blue = A0;
 const byte green = A1;
 SoftwareSerial gsmMod(3, 2);
 
-//Assign variables constants for use ibn logic and whatnot
+//Assign variables constants for use in computations
 const int flood_Level_1 = 30; //Distance between water and ultsen to determine flood level
 const int flood_Level_2 = 20; //Distance between water and ultsen to determine flood level
 const int flood_Level_3 = 10; //Distance between water and ultsen to determine flood level
 const float sound_Speed = 0.0343; //Initialize for use in get_Distance() function
+const int starting_Height_Of_Ultsen = 50; //Change to however high the ultsen is from the ground when final testing (centimeters because *NO ONE LIKES IMPERIAL*)
 const float normal_Humidity = 90; //This variable is what we will compare the relative humidity to, to determine if it is raining
 const float normal_Temperature = 27; //This variable is what we will compare the relative temp to, to determine if it is raining
-String test_Number = "+639948033248"; //Phone number ni Ash; For debugging purposes; I take it back this was left unused
-bool rain = false; //This variable is the placeholder for the condition when the device will assume its raining and start running the flood level detection processes
-//Basically, "if raining then check if flooding"
-int flood_Severity = 0;
-float pulse_Delay; //Initialize for use in get_Distance() function
+const String test_Number = "+639948033248"; //Phone number ni Ash; For debugging purposes; I take it back this was left unused
+
+float water_Level; //Initialize for use when checking flood severity
+float pulse_Delay; //Initialize for use in get_Water_Level() function
 float distance; //Initialize for use in get_Distance() function
 float humidity; //Initialize for use in get_Humidity() function
-float temperature;
+float temperature; //Initialize for use in get_Temperature() function
 char flood_Message_Light[] = "The flood is 4in deep. Please stay alert for evacuation";
 char flood_Message_Moderate[] = "The flood is 8in deep. Please stay alert for evacuation";
 char flood_Message_Severe[] = "The flood is 8in deep. Please evacuate";
+
+//Variables used for logic and functions
+bool rain = false; //This variable is the placeholder for the condition when the device will assume its raining and start running the flood level detection processes
+//Basically, "if raining then check if flooding"
+int flood_Severity = 0;
+
 
 
 void setup () {
@@ -61,7 +67,7 @@ void loop () {
 
   if (rain) {
     digitalWrite(ult_Sen_Pin, HIGH);
-    get_Distance(50); //Get water level by computing for the distance between ultrasonic sensor and the water level
+    get_Water_Level(50); //Get water level by computing for the distance between ultrasonic sensor and the water level
     if (distance <= flood_Level_3) {
     flood_Severity = 3;
   } else if (distance <= flood_Level_2) {
@@ -117,7 +123,7 @@ void loop () {
     break;
 
     default:
-      digitalWrite(siren_Severity_1, LOW); //Turn off all siren noises (precaution)
+      digitalWrite(siren_Severity_1, LOW); //Turn off all siren noises (failsafe)
       digitalWrite(siren_Severity_2, LOW);
       digitalWrite(siren_Severity_3, LOW);
     break;
@@ -125,7 +131,7 @@ void loop () {
 
 }
 
-void get_Distance(int pulse_Length) {
+void get_Water_Level(int pulse_Length) {
 
   digitalWrite(trig_Pin, LOW); //Initialize trigger pin
   delay(50); //Delay for accuracy
@@ -135,7 +141,9 @@ void get_Distance(int pulse_Length) {
 
   pulse_Delay = (pulseIn(echo_Pin, HIGH))/2; //Get the time it took for the pulse to get from the ultrasonic sensor to object
   distance = (pulse_Delay)*sound_Speed; //Compute for distance using formula speed*time
-  Serial.println(distance);
+
+  water_Level = (starting_Height_Of_Ultsen - distance);
+  Serial.println(water_Level);
 }
 
 void get_Humidity() {
@@ -158,7 +166,7 @@ void get_Humidity() {
 void send_SMS(String recipient_Num, String message) {
   gsmMod.println("AT+CMGF=1"); // Configuring TEXT mode
   updateSerial();
-  gsmMod.println("AT+CMGS=\"+639948033248\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms; defaults to ash' phone number (sorry in advance for spam)
+  gsmMod.println("AT+CMGS=\"+639948033248\"");//defaults to ash' phone number (sorry in advance for spam)
   updateSerial();
   gsmMod.print(message); //text content
   updateSerial();
@@ -173,7 +181,7 @@ void rgb(int red_Val, int green_Val, int blue_Val ) {
 
 void updateSerial()
 {
-  delay(500); //COmment line of code when debugging
+  delay(500); //Comment line of code when debugging
   while (Serial.available()) 
   {
     gsmMod.write(Serial.read());//Forward what Serial received to Software Serial Port
