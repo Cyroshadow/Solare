@@ -20,8 +20,9 @@ SoftwareSerial gsmMod(3, 2);
 const int flood_Level_1 = 10; //Distance between water and ultsen to determine flood level
 const int flood_Level_2 = 20; //Distance between water and ultsen to determine flood level
 const int flood_Level_3 = 30; //Distance between water and ultsen to determine flood level
+const int siren_Length = 60000; //How long to sound the siren (milliseconds)
+const float starting_Height_Of_Ultsen = 47; //Change to however high the ultsen is from the ground when final testing (centimeters because *NO ONE LIKES IMPERIAL*)
 const float sound_Speed = 0.0343; //Initialize for use in get_Distance() function
-const int starting_Height_Of_Ultsen = 47; //Change to however high the ultsen is from the ground when final testing (centimeters because *NO ONE LIKES IMPERIAL*)
 const float normal_Humidity = 90; //This variable is what we will compare the relative humidity to, to determine if it is raining
 const float normal_Temperature = 27; //This variable is what we will compare the relative temp to, to determine if it is raining
 const String test_Number = "+639948033248"; //Phone number ni Ash; For debugging purposes; I take it back this was left unused
@@ -34,7 +35,7 @@ float temperature; //Initialize for use in get_Temperature() function
 char flood_Message_Light[] = "The flood is 4in deep. Please stay alert for evacuation";
 char flood_Message_Moderate[] = "The flood is 8in deep. Please stay alert for evacuation";
 char flood_Message_Severe[] = "The flood is 8in deep. Please evacuate";
-
+bool sound_Siren = false; //This variable declares whether to sound the siren or not
 //Variables used for logic and functions
 bool rain = false; //This variable is the placeholder for the condition when the device will assume its raining and start running the flood level detection processes
 //Basically, "if raining then check if flooding"
@@ -70,16 +71,21 @@ void loop () {
     get_Water_Level(50); //Get water level by computing for the distance between ultrasonic sensor and the water level
     if (water_Level >= flood_Level_3) {
     flood_Severity = 3;
+    sound_Siren = true;
   } else if (water_Level >= flood_Level_2) {
     flood_Severity = 2;
+    sound_Siren = true;
   } else if (water_Level >= flood_Level_1) {
     flood_Severity = 1;
+    sound_Siren = true;
   } else {
     flood_Severity = 0;
+    sound_Siren = false;
   }
   } else {
     digitalWrite(ult_Sen_Pin, LOW);
     flood_Severity = 0;
+    sound_Siren = false;
   }
   
 
@@ -97,7 +103,13 @@ void loop () {
 
     case 1:
       //send_SMS(test_Number, flood_Message_Light);
-      digitalWrite(siren_Severity_1, HIGH); //Turn on siren noise 1
+      if (sound_Siren) {
+        digitalWrite(siren_Severity_1, HIGH); //Turn on siren noise 1
+        delay(siren_Length);
+        digitalWrite(siren_Severity_1, LOW);
+        sound_Siren = false;
+      }
+      
       digitalWrite(siren_Severity_2, LOW);
       digitalWrite(siren_Severity_3, LOW);
       Serial.println("Level 1 Flood");
@@ -106,7 +118,13 @@ void loop () {
 
     case 2:
       //send_SMS(test_Number, flood_Message_Moderate);
-      digitalWrite(siren_Severity_2, HIGH); //Turn on siren noise 2
+      if (sound_Siren) {
+        digitalWrite(siren_Severity_2, HIGH); //Turn on siren noise 1
+        delay(siren_Length);
+        digitalWrite(siren_Severity_2, LOW);
+        sound_Siren = false;
+      }
+      
       digitalWrite(siren_Severity_1, LOW);
       digitalWrite(siren_Severity_3, LOW);
       Serial.println("Level 2 Flood");
@@ -115,7 +133,13 @@ void loop () {
 
     case 3:
       //send_SMS(test_Number, flood_Message_Severe);
-      digitalWrite(siren_Severity_3, HIGH); //Turn on siren noise 3
+      if (sound_Siren) {
+        digitalWrite(siren_Severity_3, HIGH); //Turn on siren noise 1
+        delay(siren_Length);
+        digitalWrite(siren_Severity_3, LOW);
+        sound_Siren = false;
+      }
+      
       digitalWrite(siren_Severity_1, LOW);
       digitalWrite(siren_Severity_2, LOW);
       Serial.println("Level 3 Flood");
