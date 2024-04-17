@@ -17,9 +17,9 @@ const byte green = A1;
 SoftwareSerial gsmMod(3, 2);
 
 //Assign variables constants for use in computations
-const int flood_Level_1 = 10; //Distance between water and ultsen to determine flood level
-const int flood_Level_2 = 20; //Distance between water and ultsen to determine flood level
-const int flood_Level_3 = 30; //Distance between water and ultsen to determine flood level
+const int flood_Level_1 = 15; //Distance between water and ultsen to determine flood level
+const int flood_Level_2 = 25; //Distance between water and ultsen to determine flood level
+const int flood_Level_3 = 35; //Distance between water and ultsen to determine flood level
 const int siren_Length = 60000; //How long to sound the siren (milliseconds)
 const float starting_Height_Of_Ultsen = 47; //Change to however high the ultsen is from the ground when final testing (centimeters because *NO ONE LIKES IMPERIAL*)
 const float sound_Speed = 0.0343; //Initialize for use in get_Distance() function
