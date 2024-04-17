@@ -17,11 +17,11 @@ const byte green = A1;
 SoftwareSerial gsmMod(3, 2);
 
 //Assign variables constants for use in computations
-const int flood_Level_1 = 30; //Distance between water and ultsen to determine flood level
+const int flood_Level_1 = 10; //Distance between water and ultsen to determine flood level
 const int flood_Level_2 = 20; //Distance between water and ultsen to determine flood level
-const int flood_Level_3 = 10; //Distance between water and ultsen to determine flood level
+const int flood_Level_3 = 30; //Distance between water and ultsen to determine flood level
 const float sound_Speed = 0.0343; //Initialize for use in get_Distance() function
-const int starting_Height_Of_Ultsen = 50; //Change to however high the ultsen is from the ground when final testing (centimeters because *NO ONE LIKES IMPERIAL*)
+const int starting_Height_Of_Ultsen = 47; //Change to however high the ultsen is from the ground when final testing (centimeters because *NO ONE LIKES IMPERIAL*)
 const float normal_Humidity = 90; //This variable is what we will compare the relative humidity to, to determine if it is raining
 const float normal_Temperature = 27; //This variable is what we will compare the relative temp to, to determine if it is raining
 const String test_Number = "+639948033248"; //Phone number ni Ash; For debugging purposes; I take it back this was left unused
@@ -68,11 +68,11 @@ void loop () {
   if (rain) {
     digitalWrite(ult_Sen_Pin, HIGH);
     get_Water_Level(50); //Get water level by computing for the distance between ultrasonic sensor and the water level
-    if (distance <= flood_Level_3) {
+    if (water_Level >= flood_Level_3) {
     flood_Severity = 3;
-  } else if (distance <= flood_Level_2) {
+  } else if (water_Level >= flood_Level_2) {
     flood_Severity = 2;
-  } else if (distance <= flood_Level_1) {
+  } else if (water_Level >= flood_Level_1) {
     flood_Severity = 1;
   } else {
     flood_Severity = 0;
@@ -160,7 +160,7 @@ void get_Humidity() {
   Serial.println(humidity);
   Serial.print("Temperature: "); 
   Serial.println(temperature);
-  rain = true; //Comment/remove this code when doing field/final testing
+  //rain = true; //Comment/remove this code when doing field/final testing
 }
 
 void send_SMS(String recipient_Num, String message) {
@@ -181,7 +181,7 @@ void rgb(int red_Val, int green_Val, int blue_Val ) {
 
 void updateSerial()
 {
-  delay(500); //Comment line of code when debugging
+  //delay(500); //Comment line of code when debugging
   while (Serial.available()) 
   {
     gsmMod.write(Serial.read());//Forward what Serial received to Software Serial Port
