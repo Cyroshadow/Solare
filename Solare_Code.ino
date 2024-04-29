@@ -17,9 +17,9 @@ const byte blue = A2;
 SoftwareSerial gsmMod(3, 2);
 
 //Assign variables constants for use in computations
-const int flood_Level_1 = 5; //Distance between water and ultsen to determine flood level
-const int flood_Level_2 = 10; //Distance between water and ultsen to determine flood level
-const int flood_Level_3 = 20; //Distance between water and ultsen to determine flood level
+const int flood_Level_1 = 6; //Distance between water and ultsen to determine flood level
+const int flood_Level_2 = 12; //Distance between water and ultsen to determine flood level
+const int flood_Level_3 = 18; //Distance between water and ultsen to determine flood level
 const float sound_Speed = 0.0343; //Initialize for use in get_Distance() function
 const int starting_Height_Of_Ultsen = 47; //Change to however high the ultsen is from the ground when final testing (centimeters because *NO ONE LIKES IMPERIAL*)
 const float normal_Humidity = 90; //This variable is what we will compare the relative humidity to, to determine if it is raining
