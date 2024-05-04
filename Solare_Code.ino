@@ -24,7 +24,7 @@ const float sound_Speed = 0.0343; //Initialize for use in get_Distance() functio
 const int starting_Height_Of_Ultsen = 47; //Change to however high the ultsen is from the ground when final testing (centimeters because *NO ONE LIKES IMPERIAL*)
 const float normal_Humidity = 90; //This variable is what we will compare the relative humidity to, to determine if it is raining
 const float normal_Temperature = 35; //This variable is what we will compare the relative temp to, to determine if it is raining
-const String test_Number = "+639948033248"; //Phone number ni Ash; For debugging purposes; I take it back this was left unused
+const String test_Number = "+63949849358"; //Phone number ni Mika; For debugging purposes; I take it back this was left unused
 
 float water_Level; //Initialize for use when checking flood severity
 float pulse_Delay; //Initialize for use in get_Water_Level() function
@@ -56,7 +56,7 @@ void setup () {
   rgb(255, 135, 0);
 
   gsmMod.println("AT+CMGF=1"); // Configuring TEXT mode
-  gsmMod.println("AT+CMGS=\"+639948033248\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms
+  gsmMod.println("AT+CMGS=\"+63949849358\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms
   updateSerial();
 }
 
@@ -156,7 +156,7 @@ void get_Humidity() {
 void send_SMS(String recipient_Num, String message) {
   gsmMod.println("AT+CMGF=1"); // Configuring TEXT mode
   updateSerial();
-  gsmMod.println("AT+CMGS=\"+639948033248\"");//defaults to ash' phone number (sorry in advance for spam)
+  gsmMod.println("AT+CMGS=\"+63949849358\"");//defaults to ash' phone number (sorry in advance for spam)
   updateSerial();
   gsmMod.print(message); //text content
   updateSerial();
